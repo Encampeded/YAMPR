@@ -17,7 +17,6 @@ class RichMPresenceV:
         self._RPC = Presence(1427764951690252308)
         self._RPC.connect()
         self._RPC.clear()
-        print("Initialized!")
 
         self.playing = False
         self.position = 0.0
@@ -50,7 +49,7 @@ class RichMPresenceV:
     def set_song_info(self):
         path = unquote(self._player.Metadata["xesam:url"])[7:]
 
-        if not TinyTag.is_supported(path) or not path.startswith("/home/theo/Music/"):
+        if not TinyTag.is_supported(path) or not path.startswith(""):
             return
 
         self.song = TinyTag.get(path, image=True)
@@ -66,7 +65,6 @@ class RichMPresenceV:
     # --------------------------------------------------------------------------------------------------------- #
 
     def update(self):
-        print("Updating...")
         self._RPC.update(
             activity_type = ActivityType.LISTENING,
             status_display_type = StatusDisplayType.NAME,
@@ -80,7 +78,6 @@ class RichMPresenceV:
             large_image = self.large_image,
             large_text = self.song.album,
         )
-        print("Cycle Complete!\n")
 
     # --------------------------------------------------------------------------------------------------------- #
 
@@ -98,6 +95,7 @@ class RichMPresenceV:
             return sleep_time
 
         self.update()
+        print("Cycle completed!\n")
 
         return min(15.0, self.song.duration - self.position)
 
@@ -110,8 +108,8 @@ class RichMPresenceV:
     def loop(self):
         atexit.register(rpc._exit_rpc)
 
-        while True:
-            try:
+        try:
+            while True:
                 sleep_time = rpc.refresh()
 
                 if not self.playing:
@@ -120,9 +118,8 @@ class RichMPresenceV:
 
                 time.sleep(sleep_time)
 
-            except KeyboardInterrupt:
-                self._exit_rpc()
-                break
+        finally:
+            self._exit_rpc()
 
 if __name__ == "__main__":
     rpc = RichMPresenceV()
