@@ -1,6 +1,6 @@
 # YAMPR
 
-<img align="right" alt="Example Rich Presence" src="img/example.png" width=42%/>
+<img align="right" alt="Example Rich Presence" src="img/example.png" height=150/>
 
 **Y**et **A**nother **MP**RIS Discord **R**PC Client
 
@@ -35,7 +35,12 @@ Just run rpc.py
 python rpc.py
 ```
 You can configure the appearance of your rich presence in config.py
-See reference.png below for what the variables affect.
-<br>
-<br>
-![config reference](img/reference.png "Woah isn't that neat")
+
+<img align="right" alt="Example Rich Presence" src="img/reference.png" height=150/>
+
+```python
+LISTENING_TO = "LISTENING_TO"
+TITLE = "TITLE"
+SUBTITLE = "SUBTITLE"
+IMAGE_LABEL = "IMAGE_LABEL"
+```

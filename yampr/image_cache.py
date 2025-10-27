@@ -1,7 +1,7 @@
 import json
 import os.path
-from requests import post
-from pathlib import Path
+import requests
+import pathlib
 from tinytag import TinyTag
 import config
 
@@ -10,7 +10,7 @@ class ImageCache:
     DEFAULT_IMAGE = "https://pomf2.lain.la/f/68f8d9nl.png"
 
     def __init__(self):
-        self._image_cache_path = Path(__file__).with_name('image_cache.json')
+        self._image_cache_path = pathlib.Path(__file__).with_name('image_cache.json')
 
         if not os.path.exists(self._image_cache_path):
             open(self._image_cache_path, "w").write("{}")
@@ -27,7 +27,7 @@ class ImageCache:
                 files = {"files[]": ('~/cover.jpg', image_data)}
 
                 print("Uploading...")
-                response = post(f"https://pomf2.lain.la/upload.php", files=files)
+                response = requests.post(f"https://pomf2.lain.la/upload.php", files=files)
                 print("Done!\n")
 
                 if response.status_code == 200:

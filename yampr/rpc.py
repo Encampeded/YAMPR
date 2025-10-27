@@ -1,20 +1,19 @@
 import time
-from urllib.parse import unquote
-from pydbus import SessionBus
-from pypresence import Presence
-from pypresence import ActivityType
+import urllib.parse
+import pydbus
+import pypresence
 from tinytag import TinyTag
 from image_cache import ImageCache
 import config
 
-class RichMPresenceV:
+class RichPresence:
 
     def __init__(self):
         self._image_cache = ImageCache()
-        self._bus = SessionBus()
+        self._bus = pydbus.SessionBus()
         self._player = None
 
-        self._RPC = Presence(1427764951690252308)
+        self._RPC = pypresence.Presence(1427764951690252308)
         self._RPC.connect()
         self._RPC.clear()
 
@@ -48,7 +47,7 @@ class RichMPresenceV:
         if not raw_path.startswith("file://"):
             return False
 
-        path = unquote(raw_path)[7:]
+        path = urllib.parse.unquote(raw_path)[7:]
 
         if not TinyTag.is_supported(path) or not path.startswith(config.REQUIRED_PATH):
             return False
@@ -69,7 +68,7 @@ class RichMPresenceV:
             return getattr(self.song, value, value)
 
         self._RPC.update(
-            activity_type = ActivityType.LISTENING,
+            activity_type = pypresence.ActivityType.LISTENING,
             name = try_get(config.LISTENING_TO),
 
             details = try_get(config.TITLE),
@@ -107,7 +106,5 @@ class RichMPresenceV:
             self._exit_rpc()
 
 if __name__ == "__main__":
-    rpc = RichMPresenceV()
+    rpc = RichPresence()
     rpc.loop()
-
-
