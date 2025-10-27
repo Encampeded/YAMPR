@@ -1,8 +1,7 @@
 import json
-import os.path
 import requests
 import pathlib
-from tinytag import TinyTag
+import os.path
 import config
 
 class ImageCache:
@@ -19,24 +18,28 @@ class ImageCache:
             self._image_cache = json.load(f)
 
     @staticmethod
-    def _upload(image_data: str):
+    def _upload(image_data: str) -> str:
+        print("Uploading...")
+
+        link = ""
         match config.UPLOAD_SERVICE:
             case "pomf.lain.la":
-                # idk why it needs "~/cover.jpg", but it just doesn't work
-                # without it :shrug:
+                # Without "~/cover.jpg" it just doesn't upload
+                # Not sure why
                 files = {"files[]": ('~/cover.jpg', image_data)}
 
-                print("Uploading...")
                 response = requests.post(f"https://pomf2.lain.la/upload.php", files=files)
-                print("Done!\n")
 
                 if response.status_code == 200:
-                    return response.json()["files"][0]["url"]
+                    link = response.json()["files"][0]["url"]
                 else:
                     raise ConnectionError("Failed to Upload Cover:", response.text)
 
             case _:
                 raise ValueError("Invalid upload service! Check config.py")
+
+        print("Uploaded!\n")
+        return link
 
     def _export_cache(self):
         with self._image_cache_path.open('w', encoding="utf-8") as f:
@@ -46,7 +49,7 @@ class ImageCache:
         self._image_cache[value] = key
         self._export_cache()
 
-    def get(self, song: TinyTag) -> str:
+    def get(self, song) -> str:
         """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
         cache_key = (song.artist + ' - ' + song.album) if song.album is not None else song.filename
 

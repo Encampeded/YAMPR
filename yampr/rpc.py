@@ -1,7 +1,7 @@
+import pypresence
+import pydbus
 import time
 import urllib.parse
-import pydbus
-import pypresence
 from tinytag import TinyTag
 from image_cache import ImageCache
 import config
@@ -42,12 +42,13 @@ class RichPresence:
 
     def get_song_info(self) -> bool:
 
-        # I theorize this is necessary if the user is streaming music through vlc or something.
+        # I theorize this is necessary if the user is streaming music through vlc
+        # Untested theory, but shush
         raw_path = self._player.Metadata["xesam:url"]
         if not raw_path.startswith("file://"):
             return False
 
-        path = urllib.parse.unquote(raw_path)[7:]
+        path = urllib.parse.unquote(raw_path[7:])
 
         if not TinyTag.is_supported(path) or not path.startswith(config.REQUIRED_PATH):
             return False
@@ -99,12 +100,8 @@ class RichPresence:
     def loop(self):
         try:
             while True:
-                sleep_time = rpc.refresh()
+                sleep_time = self.refresh()
                 time.sleep(sleep_time)
 
         finally:
             self._exit_rpc()
-
-if __name__ == "__main__":
-    rpc = RichPresence()
-    rpc.loop()
