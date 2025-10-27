@@ -7,7 +7,7 @@
 "What a great acronym!"\
 \- Satisfied YAMPR user
 
-<br>
+[![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
 Features I haven't seen elsewhere:
 - **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music actually display their covers!
