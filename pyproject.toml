@@ -1,0 +1,13 @@
+[project]
+name = "yampr"
+version = "0.1.0"
+description = "Yet Another MPRIS Discord RPC Client"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydbus==0.6.0",
+    "pycairo==1.28.0",
+    "pygobject==3.54.5",
+    "pypresence~=4.6.1",
+    "tinytag~=2.1.2",
+]
