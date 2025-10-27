@@ -22,6 +22,8 @@ class ImageCache:
     def _upload(image_data: str):
         match config.UPLOAD_SERVICE:
             case "pomf.lain.la":
+                # idk why it needs "~/cover.jpg", but it just doesn't work
+                # without it :shrug:
                 files = {"files[]": ('~/cover.jpg', image_data)}
 
                 print("Uploading...")
@@ -48,19 +50,9 @@ class ImageCache:
         """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
         cache_key = (song.artist + ' - ' + song.album) if song.album is not None else song.filename
 
-        if cache_key in self._image_cache:
-            return self._image_cache[cache_key]
+        if cache_key not in self._image_cache:
+            image = song.images.any
+            link = self.DEFAULT_IMAGE if image is None else self._upload(image.data)
+            self._update_cache(cache_key, link)
 
-        image = song.images.any
-
-        if image is None:
-            self._update_cache(cache_key, self.DEFAULT_IMAGE)
-            return self.DEFAULT_IMAGE
-
-        print("Uploading...")
-        link = self._upload(image.data)
-        print("Uploaded Successfully!")
-
-        self._update_cache(cache_key, link)
-
-        return link
+        return self._image_cache[cache_key]
