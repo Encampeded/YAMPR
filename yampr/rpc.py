@@ -50,7 +50,7 @@ class RichMPresenceV:
 
         path = unquote(raw_path)[7:]
 
-        if not TinyTag.is_supported(path) or not path.startswith(""):
+        if not TinyTag.is_supported(path) or not path.startswith(config.REQUIRED_PATH):
             return False
 
         self.song = TinyTag.get(path, image=True)
