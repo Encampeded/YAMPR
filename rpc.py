@@ -1,11 +1,11 @@
 import time
-import atexit
 from urllib.parse import unquote
 from pydbus import SessionBus
 from pypresence import Presence
-from pypresence import ActivityType, StatusDisplayType
+from pypresence import ActivityType
 from tinytag import TinyTag
 from image_cache import ImageCache
+import config
 
 class RichMPresenceV:
 
@@ -18,12 +18,9 @@ class RichMPresenceV:
         self._RPC.connect()
         self._RPC.clear()
 
-        self.playing = False
         self.position = 0.0
         self.large_image = ""
         self.song = TinyTag()
-
-    # --------------------------------------------------------------------------------------------------------- #
 
     def scan_for_player(self) -> bool:
         players = self._bus.get("org.freedesktop.DBus", "/org/freedesktop/DBus").ListNames()
@@ -31,7 +28,7 @@ class RichMPresenceV:
 
         for player_name in players:
 
-            if not player_name.startswith("org.mpris.MediaPlayer2.mpv"):
+            if not player_name.startswith("org.mpris.MediaPlayer2"):
                 continue
 
             player = self._bus.get(player_name, "/org/mpris/MediaPlayer2")
@@ -44,78 +41,66 @@ class RichMPresenceV:
 
         return False
 
-    # --------------------------------------------------------------------------------------------------------- #
+    def get_song_info(self) -> bool:
 
-    def set_song_info(self):
-        path = unquote(self._player.Metadata["xesam:url"])[7:]
+        # I theorize this is necessary if the user is streaming music through vlc or something.
+        raw_path = self._player.Metadata["xesam:url"]
+        if not raw_path.startswith("file://"):
+            return False
+
+        path = unquote(raw_path)[7:]
 
         if not TinyTag.is_supported(path) or not path.startswith(""):
-            return
+            return False
 
         self.song = TinyTag.get(path, image=True)
         for attr in ["title", "artist"]:
             if getattr(self.song, attr) is None:
-                return
-
-        self.playing = True
+                return False
 
         self.position = self._player.Position / 1000000
         self.large_image = self._image_cache.get(self.song)
 
-    # --------------------------------------------------------------------------------------------------------- #
+        return True
 
     def update(self):
+
+        def try_get(value: str) -> str:
+            return getattr(self.song, value, value)
+
         self._RPC.update(
             activity_type = ActivityType.LISTENING,
-            status_display_type = StatusDisplayType.NAME,
+            name = try_get(config.LISTENING_TO),
 
-            details = self.song.title,
-            state = self.song.artist,
+            details = try_get(config.TITLE),
+            state = try_get(config.SUBTITLE),
 
             start = time.time() - self.position,
             end   = time.time() - self.position + self.song.duration,
 
             large_image = self.large_image,
-            large_text = self.song.album,
+            large_text = try_get(config.IMAGE_LABEL)
         )
 
-    # --------------------------------------------------------------------------------------------------------- #
-
     def refresh(self) -> float:
-        sleep_time = 15
-        self.scan_for_player()
+        default_sleep = 15.0
 
-        if self._player is None:
-            self.playing = False
-            return sleep_time
-
-        self.set_song_info()
-
-        if not self.playing:
-            return sleep_time
+        if not self.scan_for_player() or not self.get_song_info():
+            self._RPC.clear()
+            return default_sleep
 
         self.update()
-        print("Cycle completed!\n")
 
-        return min(15.0, self.song.duration - self.position)
-
-    # --------------------------------------------------------------------------------------------------------- #
+        return min(default_sleep, self.song.duration - self.position)
 
     def _exit_rpc(self):
         self._RPC.clear()
         self._RPC.close()
 
     def loop(self):
-        atexit.register(rpc._exit_rpc)
-
         try:
             while True:
                 sleep_time = rpc.refresh()
-
-                if not self.playing:
-                    self._RPC.clear()
-                    print("Waiting for playback...")
-
                 time.sleep(sleep_time)
 
         finally:

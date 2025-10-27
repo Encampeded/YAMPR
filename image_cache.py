@@ -3,6 +3,7 @@ import os.path
 from requests import post
 from pathlib import Path
 from tinytag import TinyTag
+import config
 
 class ImageCache:
     # just a picture of the mpv logo
@@ -19,16 +20,21 @@ class ImageCache:
 
     @staticmethod
     def _upload(image_data: str):
-        files = {"files[]": ('~/cover.jpg', image_data)}
+        match config.UPLOAD_SERVICE:
+            case "pomf.lain.la":
+                files = {"files[]": ('~/cover.jpg', image_data)}
 
-        print("Uploading...")
-        response = post(f"https://pomf2.lain.la/upload.php", files=files)
-        print("Done!\n")
+                print("Uploading...")
+                response = post(f"https://pomf2.lain.la/upload.php", files=files)
+                print("Done!\n")
 
-        if response.status_code == 200:
-            return response.json()["files"][0]["url"]
-        else:
-            raise ConnectionError("Failed to Upload Cover:", response.text)
+                if response.status_code == 200:
+                    return response.json()["files"][0]["url"]
+                else:
+                    raise ConnectionError("Failed to Upload Cover:", response.text)
+
+            case _:
+                raise ValueError("Invalid upload service! Check config.py")
 
     def _export_cache(self):
         with self._image_cache_path.open('w', encoding="utf-8") as f:
@@ -39,7 +45,7 @@ class ImageCache:
         self._export_cache()
 
     def get(self, song: TinyTag) -> str:
-        """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not in."""
+        """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
         cache_key = (song.artist + ' - ' + song.album) if song.album is not None else song.filename
 
         if cache_key in self._image_cache:
@@ -51,7 +57,9 @@ class ImageCache:
             self._update_cache(cache_key, self.DEFAULT_IMAGE)
             return self.DEFAULT_IMAGE
 
+        print("Uploading...")
         link = self._upload(image.data)
+        print("Uploaded Successfully!")
 
         self._update_cache(cache_key, link)
 
