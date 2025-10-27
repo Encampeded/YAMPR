@@ -1,8 +1,13 @@
 # YAMPR
+
+<img align="right" alt="Example Rich Presence" src="img/example.png" width=40%/>
+
 **Y**et **A**nother **MP**RIS Discord **R**PC Client
 
 "What a great acronym!"\
 \- Satisfied YAMPR user
+
+<br>
 
 Features I haven't seen elsewhere:
 - Configurability: Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
@@ -29,4 +34,7 @@ Just run rpc.py!
 $ python rpc.py
 ```
 You can configure the appearance of your rich presence in config.py
-See reference.png for what the variables affect.
+See reference.png below for what the variables affect.
+<br>
+<br>
+![config reference](img/reference.png "Woah isn't that neat")
