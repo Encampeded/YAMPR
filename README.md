@@ -10,10 +10,10 @@
 <br>
 
 Features I haven't seen elsewhere:
-- Custom Covers: Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music actually display their covers!
+- **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music actually display their covers!
   - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward.
-- Configurability: Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
-- Instant Updating: Your rich presence will update as soon as your music ends; no more getting stuck at the end of a song! ~~is this an actual feature or~~
+- **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
+- **Instant Updating:** Your rich presence will update as soon as your music ends; no more getting stuck at the end of a song! ~~is this an actual feature or~~
 
 ## Setup
 If you're on Arch:
