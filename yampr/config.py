@@ -7,9 +7,9 @@ UPLOAD_SERVICE = "pomf.lain.la"
 REQUIRED_PATH = ""
 
 # Refer to reference.png
-# Set them to one of the following to display info from current song:
-# title, artist, composer, albumartist, album, track, track_total
-# disc, disc_total, year, genre
+# Set to one of the following to display info from current song:
+#   title, artist, composer, albumartist, album
+#   track, track_total, disc, disc_total, year, genre
 LISTENING_TO = "music"
 TITLE = "title"
 SUBTITLE = "artist"
