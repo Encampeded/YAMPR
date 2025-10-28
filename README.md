@@ -14,7 +14,7 @@ Features I haven't seen elsewhere:
   - The links are stored in a json file, so you can easily swap around or add images to songs without them
   - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward
 - **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
-- **Instant Updating:** Your rich presence will update as soon as your music ends; no more getting stuck at the end of a song! ~~is this an actual feature or~~
+- **Instant Updating:** Thanks to the power of asyncio, your rich presence will update instantly when you start a new song.
 
 ## Setup
 If you're on Arch:
