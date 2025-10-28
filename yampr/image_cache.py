@@ -3,6 +3,7 @@ import requests
 import pathlib
 import os.path
 import config
+import time
 
 class ImageCache:
     # just a picture of the mpv logo
@@ -16,6 +17,22 @@ class ImageCache:
 
         with self._image_cache_path.open('r') as f:
             self._image_cache = json.load(f)
+
+        if not config.VERIFY_IMAGES:
+            return
+
+        print("Checking...")
+        for i, (key, link) in enumerate(self._image_cache.copy().items()):
+            print(f"{i:02d}/{len(self._image_cache)}", end=" ")
+
+            if requests.get(link).status_code == 404:
+                print(key + " doesn't exist! Removing...")
+                self._image_cache.pop(key)
+
+            print("", end = '\r')
+
+        self._export_cache()
+        print("Verification complete!")
 
     @staticmethod
     def _upload(image_data: str) -> str:
@@ -45,10 +62,6 @@ class ImageCache:
         with self._image_cache_path.open('w', encoding="utf-8") as f:
             json.dump(self._image_cache, f, ensure_ascii=False, indent=4)
 
-    def _update_cache(self, value, key):
-        self._image_cache[value] = key
-        self._export_cache()
-
     def get(self, song) -> str:
         """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
         cache_key = (song.artist + ' - ' + song.album) if song.album is not None else song.filename
@@ -56,6 +69,7 @@ class ImageCache:
         if cache_key not in self._image_cache:
             image = song.images.any
             link = self.DEFAULT_IMAGE if image is None else self._upload(image.data)
-            self._update_cache(cache_key, link)
+            self._image_cache[cache_key] = link
+            self._export_cache()
 
         return self._image_cache[cache_key]
