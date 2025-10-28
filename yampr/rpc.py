@@ -1,5 +1,6 @@
 import pypresence
-import pydbus
+#import pydbus
+import dasbus.connection
 import time
 import urllib.parse
 from tinytag import TinyTag
@@ -10,8 +11,9 @@ class RichPresence:
 
     def __init__(self):
         self._image_cache = ImageCache()
-        self._bus = pydbus.SessionBus()
+        self._bus = dasbus.connection.SessionMessageBus()
         self._player = None
+        self._player_metadata = {}
 
         self._RPC = pypresence.Presence(1427764951690252308)
         self._RPC.connect()
@@ -22,29 +24,41 @@ class RichPresence:
         self.song = TinyTag()
 
     def scan_for_player(self) -> bool:
-        players = self._bus.get("org.freedesktop.DBus", "/org/freedesktop/DBus").ListNames()
+
+        names = self._bus.get_proxy("org.freedesktop.DBus",
+                                "/org/freedesktop/DBus").ListNames()
+
+        players = [ name[23:] for name in names if name.startswith("org.mpris.MediaPlayer2") ]
+
         self._player = None
 
         for player_name in players:
 
-            if not player_name.startswith("org.mpris.MediaPlayer2"):
+            player = self._bus.get_proxy(
+                "org.mpris.MediaPlayer2." + player_name,
+                "/org/mpris/MediaPlayer2",
+                "org.freedesktop.DBus.Properties"
+            )
+
+            playback_status = player.Get("org.mpris.MediaPlayer2.Player", "PlaybackStatus").unpack()
+
+            if playback_status == "Stopped":
                 continue
 
-            player = self._bus.get(player_name, "/org/mpris/MediaPlayer2")
-
-            if player.PlaybackStatus == "Paused":
-                continue
-
+            self._player_metadata = player.Get("org.mpris.MediaPlayer2.Player", "Metadata")
             self._player = player
+
             return True
 
         return False
 
     def get_song_info(self) -> bool:
 
+        #print(self._player.Metadata)
+
         # I theorize this is necessary if the user is streaming music through vlc
         # Untested theory, but shush
-        raw_path = self._player.Metadata["xesam:url"]
+        raw_path = self._player_metadata["xesam:url"]
         if not raw_path.startswith("file://"):
             return False
 
@@ -58,7 +72,7 @@ class RichPresence:
             if getattr(self.song, attr) is None:
                 return False
 
-        self.position = self._player.Position / 1000000
+        self.position = self._player.Get("org.mpris.MediaPlayer2.Player", "Position").unpack() // 1000000
         self.large_image = self._image_cache.get(self.song)
 
         return True
