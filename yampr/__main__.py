@@ -1,15 +1,10 @@
-import dbus
-
+import pypresence
+import time
+import asyncio
+from dbus import DBusConnection
 from image_cache import ImageCache
 from song import Song
-from dbus import DBusConnection
-import pypresence
-import asyncio
 import config
-import time
-
-def get_song_info() -> Song:
-    pass
 
 async def main():
 
@@ -21,7 +16,7 @@ async def main():
         loop = asyncio.get_running_loop()
     )
 
-    dbus_connection = dbus.DBusConnection()
+    dbus_connection = DBusConnection()
 
     async with asyncio.TaskGroup() as tg:
         tg.create_task(dbus_connection.setup())
@@ -29,13 +24,8 @@ async def main():
         if config.VERIFY_IMAGES:
             tg.create_task(image_cache.verify_images())
 
-    # ------- Main Loop -------#
-    #
-    # When properties change...
-    #
 
-    while True:
-        found_player = asyncio.Event()
+    while True: # ------- Main Loop -------#
 
         try:
             print("Waiting for player...")
@@ -77,27 +67,8 @@ async def main():
 
         finally:
             await dbus_connection.close()
+            #asyncio.get_running_loop().close()
             rpc.close()
-
-
-
-
-"""
-    def on_properties_changed(interface_name, changed_properties, invalidated_properties):
-        for changed, variant in changed_properties.items():
-            print(f'property changed: {changed} - {variant.value}')
-
-    properties.on_properties_changed(on_properties_changed)
-
-# Listen to signals by defining a callback that takes the args
-# specified by the signal definition and registering it on the
-# interface with on_[SIGNAL] in snake case.
-
-def changed_notify(new_value):
-    print(f'The new value is: {new_value}')
-
-interface.on_changed(changed_notify)
-"""
 
 if __name__ == "__main__":
     asyncio.run(main())

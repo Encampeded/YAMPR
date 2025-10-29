@@ -3,7 +3,6 @@ import httpx
 import pathlib
 import os.path
 import config
-import time
 
 class ImageCache:
     # just a picture of the mpv logo
