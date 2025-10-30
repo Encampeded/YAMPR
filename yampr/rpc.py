@@ -76,9 +76,11 @@ class RichPresence:
             await self._rpc.clear()
             self._dbus_connection.properties_change.clear()
 
-    def takedown(self):
-        self._dbus_connection.close()
-        self._rpc.close()
+    async def loop(self):
+        while True:
+            await self.cycle()
 
+    async def takedown(self):
+        await self._rpc.clear()
 
 

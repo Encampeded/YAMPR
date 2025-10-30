@@ -5,13 +5,13 @@ async def main():
     rpc = RichPresence()
     try:
         await rpc.setup()
+        await rpc.loop()
 
-        while True:
-            await rpc.cycle()
+    except asyncio.CancelledError:
+        print("Exiting...")
 
     finally:
-        rpc.takedown()
-        asyncio.get_running_loop().close()
+        await rpc.takedown()
 
 if __name__ == "__main__":
     asyncio.run(main())
