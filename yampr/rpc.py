@@ -62,9 +62,7 @@ class RichPresence:
 
             print("Getting info...")
             async with asyncio.TaskGroup() as tg:
-                # SHUT THE FUCK UP PYCHARM/
-                # noinspection PyUnresolvedReferences
-                tg.create_task(self.get_song())
+                tg.create_task(self.get_song()) # noqa
                 tg.create_task(self.get_position())
 
             print("Updating and awaiting properties change...")
