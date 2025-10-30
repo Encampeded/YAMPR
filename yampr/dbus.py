@@ -41,13 +41,11 @@ class DBusConnection:
         self._dbus = dbus_proxy.get_interface(self.DBUS_NAME)
 
 
-    def _check_playing (self, iname, changed_properties, invalidated_properties):
+    def _check_playing (self, _, changed_properties, __):
         self.properties_change.set()
 
         if "PlaybackStatus" in changed_properties:
             self.player_playing = False
-
-        self.properties_change.clear()
 
 
     async def find_player(self):
@@ -85,6 +83,3 @@ class DBusConnection:
 
     async def get_position(self) -> float:
         return await self._player.get_position() / 1000000
-
-    async def close(self):
-        self._bus.disconnect()
