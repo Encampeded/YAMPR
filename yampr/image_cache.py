@@ -2,7 +2,7 @@ import json
 import httpx
 import pathlib
 import os.path
-import config
+from .config import UPLOAD_SERVICE
 
 class ImageCache:
     # just a picture of the mpv logo
@@ -27,7 +27,7 @@ class ImageCache:
         print("Uploading...")
 
         link = ""
-        match config.UPLOAD_SERVICE:
+        match UPLOAD_SERVICE:
             case "pomf.lain.la":
                 # Without "~/cover.jpg" it just doesn't upload
                 # Not sure why
@@ -48,7 +48,7 @@ class ImageCache:
 
     async def get(self, song) -> str:
         """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
-        cache_key = (song.artist + ' - ' + song.album) if song.album is not None else song.file_path
+        cache_key = (song.album_artist + ' - ' + song.album) if song.album is not None else song.file_path
 
         if cache_key not in self._image_cache:
             link = self.DEFAULT_IMAGE if song.image is None else await self._upload(song.image)

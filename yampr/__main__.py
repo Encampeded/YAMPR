@@ -1,4 +1,4 @@
-from rpc import RichPresence
+from .rpc import RichPresence
 import asyncio
 
 async def main():

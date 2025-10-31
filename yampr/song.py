@@ -44,4 +44,4 @@ class Song:
         self.lyricist = list_get("lyricist")
         self.genre = list_get("genre")
         self.release_date = metadata.get("releaseDate")
-        self.image = metadata.get("image")
+        self.image = metadata.get("artUrl")

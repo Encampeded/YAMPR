@@ -1,7 +1,7 @@
 import asyncio
 import dbus_fast.aio
 import dbus_fast.introspection
-from song import Song
+from .song import Song
 
 class DBusConnection:
     DBUS_NAME = "org.freedesktop.DBus"
@@ -51,11 +51,9 @@ class DBusConnection:
     async def find_player(self):
         while True:
             names = await self._dbus.call_list_names()
+            mpris_names = [ name for name in names if name.startswith(self.MPRIS_NAME) ]
 
-            for name in names:
-
-                if not name.startswith(self.MPRIS_NAME):
-                    continue
+            for name in mpris_names:
 
                 player_object = await self.get_proxy(
                     name,

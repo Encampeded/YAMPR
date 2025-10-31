@@ -4,7 +4,10 @@ from song import Song
 from image_cache import ImageCache
 from dbus import DBusConnection
 import asyncio
-import config
+from .song import Song
+from .image_cache import ImageCache
+from .mpris_dbus import DBusConnection
+from . import config
 
 class RichPresence:
 
