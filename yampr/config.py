@@ -9,11 +9,13 @@ REQUIRED_PATH = ""
 # Verify cached image links. Will remove any that don't exist on startup,
 # but will take some time to complete.
 VERIFY_IMAGES = False
+#VERIFY_IMAGES = True
 
 # Refer to reference.png
 # Set to one of the following to display info from current song:
-#   title, artist, composer, albumartist, album
-#   track, track_total, disc, disc_total, year, genre
+#   title, artist,  album, album_artist, track_number, disc_number
+#   composer, lyricist, genre, release_date
+
 LISTENING_TO = "music"
 TITLE = "title"
 SUBTITLE = "artist"

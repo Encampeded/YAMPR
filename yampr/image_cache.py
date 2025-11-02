@@ -1,6 +1,7 @@
 import json
 import httpx
 import pathlib
+import base64
 import os.path
 from .config import UPLOAD_SERVICE
 
@@ -11,20 +12,21 @@ class ImageCache:
     def __init__(self):
         self._client = httpx.AsyncClient()
 
-        self._image_cache_path = pathlib.Path(__file__).with_name('image_cache.json')
+        self._path = pathlib.Path(__file__).with_name('image_cache.json')
 
-        if not os.path.exists(self._image_cache_path):
-            open(self._image_cache_path, "w").write("{}")
+        if not os.path.exists(self._path):
+            open(self._path, "w").write("{}")
 
-        with self._image_cache_path.open('r') as f:
+        with self._path.open('r') as f:
             self._image_cache = json.load(f)
 
     def _export_cache(self):
-        with self._image_cache_path.open('w', encoding="utf-8") as f:
+        with self._path.open('w', encoding="utf-8") as f:
             json.dump(self._image_cache, f, ensure_ascii=False, indent=4)
 
     async def _upload(self, image_data: str) -> str:
         print("Uploading...")
+        image_data = base64.b64decode(image_data[23:])
 
         link = ""
         match UPLOAD_SERVICE:

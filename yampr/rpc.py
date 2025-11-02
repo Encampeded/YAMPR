@@ -1,15 +1,11 @@
 import pypresence
 import time
-from song import Song
-from image_cache import ImageCache
-from dbus import DBusConnection
 import asyncio
-from .song import Song
 from .image_cache import ImageCache
 from .mpris_dbus import DBusConnection
 from . import config
 
-class RichPresence:
+class MPresence:
 
     def __init__(self):
         self._image_cache = ImageCache()
@@ -19,10 +15,6 @@ class RichPresence:
         )
         self._dbus_connection = DBusConnection()
 
-        self.song: Song | None = None
-        self.position = 0.0
-        self.image = ""
-
 
     async def setup(self):
         async with asyncio.TaskGroup() as tg:
@@ -31,17 +23,14 @@ class RichPresence:
             if config.VERIFY_IMAGES:
                 tg.create_task(self._image_cache.verify_images())
 
-    async def get_song(self):
-        self.song = await self._dbus_connection.get_song()
-        self.image = await self._image_cache.get(self.song)
-
-    async def get_position(self):
-        self.position = await self._dbus_connection.get_position()
 
     async def update(self):
+        position = self._dbus_connection.position
+        song = self._dbus_connection.song
+        image_link = await self._image_cache.get(song)
 
         def try_get(value: str):
-            return getattr(self.song, value, value)
+            return getattr(song, value, value)
 
         await self._rpc.update(
             activity_type=pypresence.ActivityType.LISTENING,
@@ -50,38 +39,35 @@ class RichPresence:
             details=try_get(config.TITLE),
             state=try_get(config.SUBTITLE),
 
-            start=round(time.time() - self.position),
-            end=round(time.time() - self.position + self.song.length),
+            start=round(time.time() - position),
+            end=round(time.time() - position + song.length),
 
-            large_image=self.image,
+            large_image=image_link,
             large_text=try_get(config.IMAGE_LABEL)
         )
 
     async def cycle(self):
-        print("\nFinding Player...")
-        await self._dbus_connection.find_player()
+        # To give dbus_connection time to update song
+        await asyncio.sleep(1)
 
-        while self._dbus_connection.player_playing:
+        while True:
 
-            print("Getting info...")
-            async with asyncio.TaskGroup() as tg:
-                tg.create_task(self.get_song()) # noqa
-                tg.create_task(self.get_position())
+            if not self._dbus_connection.player_stopped.is_set():
+                print("Updating...")
+                await self.update()
+            else:
+                print("No player!")
+                await self._rpc.clear()
 
-            print("Updating and awaiting properties change...")
-            async with asyncio.TaskGroup() as tg:
-                tg.create_task(self.update())
-                tg.create_task(self._dbus_connection.properties_change.wait())
-
-            print("Properties changed!")
-            await self._rpc.clear()
-            self._dbus_connection.properties_change.clear()
+            print("Waiting 15s...\n")
+            await asyncio.sleep(15)
 
     async def loop(self):
-        while True:
-            await self.cycle()
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(self._dbus_connection.cycle())
+            tg.create_task(self.cycle())
 
-    async def takedown(self):
+    async def clear(self):
         await self._rpc.clear()
 
 
