@@ -2,7 +2,6 @@ import asyncio
 import dbus_fast.aio
 import dbus_fast.introspection
 from .song import Song
-from pprint import pprint
 
 class DBusConnection:
 
@@ -19,9 +18,10 @@ class DBusConnection:
         self._player = None
         self._properties = None
 
-        self.song = Song()
-        self.position: float | None = 0.0
-        self.player_stopped = asyncio.Event()
+        self.song: Song | None = None
+        self.position = 0.0
+        self.player_playing = False
+        self.properties_changed = asyncio.Event()
 
     async def _get_proxy(self, name, path):
         return self._bus.get_proxy_object(
@@ -44,23 +44,28 @@ class DBusConnection:
         self._dbus = dbus_proxy.get_interface(self.DBUS_NAME)
 
 
-    def _update_song(self, _, changed_properties: dict, invalidate_properties):
-        #  and \
-        #             changed_properties["PlaybackStatus"].value != "Playing"
+    def _set_song(self, metadata: dict):
+        self.song = Song(metadata)
+
+    def _update_song(self, _, changed_properties: dict, __):
+        print("Received PropertiesChanged!")
         if "PlaybackStatus" in changed_properties:
-            self.player_stopped.set()
+            self.player_playing = False
 
         else:
             metadata = changed_properties["Metadata"].value
-
-            self.song.update_from_properties(metadata)
+            #print(metadata)
+            self._set_song(metadata)
             self.position = 0.0
-            # I wonder if we actually can assume ChangedProperties always means
-            # a new song, in the case it's not PlaybackStatus... Whelp!
+            # If the properties change, it implies we've moved onto a new song,
+            # meaning we can just set the position to 0.
 
-    def _update_position(self, position):
+        self.properties_changed.set()
+
+    def _update_position(self, position: int):
+        print("Received Seeked!")
         self.position = position / 1000000
-
+        self.properties_changed.set()
 
     async def find_player(self):
         while True:
@@ -76,31 +81,32 @@ class DBusConnection:
 
                 player = player_object.get_interface("org.mpris.MediaPlayer2.Player")
 
+                # Only allow playing music, so we don't get stuck on forgotten paused instances
                 if await player.get_playback_status() != "Playing":
                     continue
 
+                # Only allow local music
                 metadata = await player.get_metadata()
                 if not metadata["xesam:url"].value.startswith("file://"):
                     continue
 
-                self.song.update_from_properties(metadata)
+                # TODO: Implement only check for title/album
 
+                # Set our interfaces
                 self._player = player
-                self._player.on_seeked(self._update_position)
-                self._update_position(await self._player.get_position())
-
                 self._properties = player_object.get_interface("org.freedesktop.DBus.Properties")
+
+                # Set our signal runners
                 self._properties.on_properties_changed(self._update_song)
+                self._player.on_seeked(self._update_position)
+
+                # Get/Set our new stuff
+                position = await self._player.get_position()
+                self._update_position(position)
+                metadata = await self._player.get_metadata()
+                self._set_song(metadata)
+                self.player_playing = True
 
                 return
 
             await asyncio.sleep(5)
-
-    async def cycle(self):
-        while True:
-            print("Finding Player...")
-            await self.find_player()
-            print("Found player! Awaiting player_stopped()")
-            await self.player_stopped.wait()
-
-            self.player_stopped.clear()

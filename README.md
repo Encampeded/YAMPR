@@ -17,22 +17,23 @@ Features I haven't seen elsewhere:
 - **Instant Updating:** Thanks to the power of asyncio, your rich presence will update instantly when you start a new song.
 
 ## Setup
+Clone the repository, and install the dependencies; pypresence, dbus-fast, and HTTPX.
+
 If you're on Arch:
 ```commandline
-pacman -S python-pypresence python-pydbus python-requests
-yay -S python-tinytag
+pacman -S python-pypresence python-dbus-fast python-httpx
 ```
-Alternatively, make a venv and install requirements with pip
+Alternatively, make a virtual environment and install requirements with pip
 ```commandline
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install .
 ```
 Make sure your music player (or its backend) supports MPRIS. For example, mpv requires the mpv-mpris plugin.
 # Usage
-Just run rpc.py
+Just run the module.
 ```commandline
-python yampr
+python -m yampr
 ```
 You can configure the appearance of your rich presence in config.py
 
@@ -44,3 +45,8 @@ TITLE = "TITLE"
 SUBTITLE = "SUBTITLE"
 IMAGE_LABEL = "IMAGE_LABEL"
 ```
+
+# Contributing
+Not sure why you'd contribute but a few things to keep in mind:
+- This was my first time writing async code, so it might be ~~probably is~~ a tad messy. If you'd like to change that, be my guest; just keep that in mind.
+- 

@@ -1,4 +1,5 @@
 import json
+import time
 import httpx
 import pathlib
 import base64
@@ -48,8 +49,10 @@ class ImageCache:
         print("Uploaded!\n")
         return link
 
-    async def get(self, song) -> str:
+    async def get(self, song) -> list[str | float]:
         """Gets a link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
+        start_time = time.perf_counter()
+
         cache_key = (song.album_artist + ' - ' + song.album) if song.album is not None else song.file_path
 
         if cache_key not in self._image_cache:
@@ -57,9 +60,15 @@ class ImageCache:
             self._image_cache[cache_key] = link
             self._export_cache()
 
-        return self._image_cache[cache_key]
+        elapsed = start_time - time.perf_counter()
 
+        return [self._image_cache[cache_key], elapsed]
+
+
+    # Supply the number of images. If less than 800, just run it all.
+    # If more than 800... Tell the user. Make sure they want that.
     async def verify_images(self):
+        response = []
         for i, (key, link) in enumerate(self._image_cache.copy().items()):
             print(f"{i:02d}/{len(self._image_cache)}", end=" ")
 

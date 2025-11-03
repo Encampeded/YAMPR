@@ -15,7 +15,6 @@ class MPresence:
         )
         self._dbus_connection = DBusConnection()
 
-
     async def setup(self):
         async with asyncio.TaskGroup() as tg:
             tg.create_task(self._dbus_connection.setup())
@@ -25,47 +24,44 @@ class MPresence:
 
 
     async def update(self):
-        position = self._dbus_connection.position
         song = self._dbus_connection.song
-        image_link = await self._image_cache.get(song)
+        position = self._dbus_connection.position
+        image_link, elapsed_time = await self._image_cache.get(song)
+        position += elapsed_time
 
-        def try_get(value: str):
-            return getattr(song, value, value)
+        def try_format(string: str):
+            return string if not hasattr(song, string) else getattr(song, string)
 
         await self._rpc.update(
             activity_type=pypresence.ActivityType.LISTENING,
-            name=try_get(config.LISTENING_TO),
+            name=try_format(config.LISTENING_TO),
 
-            details=try_get(config.TITLE),
-            state=try_get(config.SUBTITLE),
+            details=try_format(config.TITLE),
+            state=try_format(config.SUBTITLE),
 
             start=round(time.time() - position),
             end=round(time.time() - position + song.length),
 
             large_image=image_link,
-            large_text=try_get(config.IMAGE_LABEL)
+            large_text=try_format(config.IMAGE_LABEL)
         )
 
     async def cycle(self):
-        # To give dbus_connection time to update song
-        await asyncio.sleep(1)
+        print("Awaiting player...")
+        await self._dbus_connection.find_player()
+        print("Found Player!")
 
-        while True:
+        while self._dbus_connection.player_playing:
+            print("\nAwaiting Properties Change...")
+            await self._dbus_connection.properties_changed.wait()
+            self._dbus_connection.properties_changed.clear() # Move these to the top of the loop
+            print("Properties Changed!")
 
-            if not self._dbus_connection.player_stopped.is_set():
-                print("Updating...")
-                await self.update()
-            else:
-                print("No player!")
-                await self._rpc.clear()
+            print("Updating... ", end = "")
+            await self.update()
+            print("Updated!")
 
-            print("Waiting 15s...\n")
-            await asyncio.sleep(15)
-
-    async def loop(self):
-        async with asyncio.TaskGroup() as tg:
-            tg.create_task(self._dbus_connection.cycle())
-            tg.create_task(self.cycle())
+        await self.clear()
 
     async def clear(self):
         await self._rpc.clear()

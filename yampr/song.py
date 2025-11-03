@@ -21,34 +21,8 @@ class Song:
         image: str | None
     """
 
-    @classmethod
-    def to_object_dict(cls, raw_metadata: dict):
-        return { key.split(':')[1]: value.value for key, value in raw_metadata.items() }
-
-    def __init__(self):
-        self.metadata = {}
-
-        self.title = ""
-        self.artist = ""
-        self.length = 0
-        self.file_path = ""
-
-        self.album = None
-        self.album_artist = None
-        self.track_number = None
-        self.disc_number = None
-        self.composer = None
-        self.lyricist = None
-        self.genre = None
-        self.release_date = None
-        self.image = None
-
-    def list_get(self, attribute):
-        value = self.metadata.get(attribute)
-        return None if value is None else ', '.join(value)
-
-    def update_from_properties(self, raw_metadata: dict):
-        self.metadata.update(self.to_object_dict(raw_metadata))
+    def __init__(self, raw_metadata):
+        self.metadata = (self.to_object_dict(raw_metadata))
 
         self.title = self.metadata["title"]
         self.artist = self.list_get("artist")
@@ -64,6 +38,15 @@ class Song:
         self.genre = self.list_get("genre")
         self.release_date = self.metadata.get("releaseDate")
         self.image = self.metadata.get("artUrl")
+
+    @staticmethod
+    def to_object_dict(raw_metadata: dict):
+        return { key.split(':')[1]: value.value for key, value in raw_metadata.items() }
+
+    def list_get(self, attribute):
+        value = self.metadata.get(attribute)
+        return None if value is None else ', '.join(value)
+
 
     def __repr__(self):
         return ", ".join([self.title, self.album, self.artist])

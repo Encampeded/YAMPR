@@ -6,13 +6,16 @@ async def main():
 
     try:
         await rpc.setup()
-        await rpc.loop()
+
+        while True:
+            await rpc.cycle()
 
     except asyncio.CancelledError:
         print("Exiting...")
 
     finally:
         await rpc.clear()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
