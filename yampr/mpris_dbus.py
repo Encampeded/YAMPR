@@ -1,4 +1,5 @@
 import asyncio
+import time
 import dbus_fast.aio
 import dbus_fast.introspection
 from .song import Song
@@ -18,8 +19,9 @@ class DBusConnection:
         self._player = None
         self._properties = None
 
-        self.song: Song | None = None
+        self.song: Song  = Song()
         self.position = 0.0
+        self.position_updated = 0.0
         self.player_playing = False
         self.properties_changed = asyncio.Event()
 
@@ -45,7 +47,7 @@ class DBusConnection:
 
 
     def _set_song(self, metadata: dict):
-        self.song = Song(metadata)
+        self.song.update_from_metadata(metadata)
 
     def _update_song(self, _, changed_properties: dict, __):
         print("Received PropertiesChanged!")
@@ -56,7 +58,7 @@ class DBusConnection:
             metadata = changed_properties["Metadata"].value
             #print(metadata)
             self._set_song(metadata)
-            self.position = 0.0
+            self._update_position(0)
             # If the properties change, it implies we've moved onto a new song,
             # meaning we can just set the position to 0.
 
@@ -65,7 +67,12 @@ class DBusConnection:
     def _update_position(self, position: int):
         print("Received Seeked!")
         self.position = position / 1000000
+        self.position_updated = time.perf_counter()
         self.properties_changed.set()
+
+    def get_position(self) -> float:
+        offset = time.perf_counter() - self.position_updated
+        return self.position + offset
 
     async def find_player(self):
         while True:
@@ -90,7 +97,8 @@ class DBusConnection:
                 if not metadata["xesam:url"].value.startswith("file://"):
                     continue
 
-                # TODO: Implement only check for title/album
+                if "xesam:artist" not in metadata:
+                    continue
 
                 # Set our interfaces
                 self._player = player

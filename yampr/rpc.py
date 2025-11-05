@@ -22,12 +22,10 @@ class MPresence:
             if config.VERIFY_IMAGES:
                 tg.create_task(self._image_cache.verify_images())
 
-
     async def update(self):
         song = self._dbus_connection.song
-        position = self._dbus_connection.position
-        image_link, elapsed_time = await self._image_cache.get(song)
-        position += elapsed_time
+        image_link = await self._image_cache.get(song)
+        position = self._dbus_connection.get_position()
 
         def try_format(string: str):
             return string if not hasattr(song, string) else getattr(song, string)
@@ -49,17 +47,20 @@ class MPresence:
     async def cycle(self):
         print("Awaiting player...")
         await self._dbus_connection.find_player()
-        print("Found Player!")
+        print("    Found Player!")
 
         while self._dbus_connection.player_playing:
             print("\nAwaiting Properties Change...")
             await self._dbus_connection.properties_changed.wait()
             self._dbus_connection.properties_changed.clear() # Move these to the top of the loop
-            print("Properties Changed!")
+            print("    Properties Changed!")
 
-            print("Updating... ", end = "")
+            print("Updating...")
             await self.update()
-            print("Updated!")
+            print("    Updated!")
+
+            print("Sleeping...")
+            await asyncio.sleep(15)
 
         await self.clear()
 
