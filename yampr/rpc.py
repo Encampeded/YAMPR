@@ -50,14 +50,14 @@ class MPresence:
         print("    Found Player!")
 
         while self._dbus_connection.player_playing:
-            print("\nAwaiting Properties Change...")
+            print("\nAwaiting MPRIS Update...")
             await self._dbus_connection.properties_changed.wait()
             self._dbus_connection.properties_changed.clear() # Move these to the top of the loop
-            print("    Properties Changed!")
+            print("    MPRIS Updated!")
 
-            print("Updating...")
+            print("Updating Rich Presence...")
             await self.update()
-            print("    Updated!")
+            print("    Rich Presence Updated!")
 
             print("Sleeping...")
             await asyncio.sleep(15)

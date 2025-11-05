@@ -49,7 +49,7 @@ class ImageCache:
             case _:
                 raise ValueError("Invalid upload service! Check config.py")
 
-        print("Uploaded!\n")
+        print("    Uploaded!")
         return link
 
     async def get(self, song) -> str:

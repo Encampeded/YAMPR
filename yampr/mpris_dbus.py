@@ -49,8 +49,13 @@ class DBusConnection:
     def _set_song(self, metadata: dict):
         self.song.update_from_metadata(metadata)
 
-    def _update_song(self, _, changed_properties: dict, __):
+    def _update_song(self, _, changed_properties: dict, other):
         print("Received PropertiesChanged!")
+
+        if len(other) > 0:
+            print(other)
+            raise("wowzers")
+
         if "PlaybackStatus" in changed_properties:
             self.player_playing = False
 
