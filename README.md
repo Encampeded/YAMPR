@@ -11,20 +11,25 @@
 
 Features I haven't seen elsewhere:
 - **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music actually display their covers!
-  - The links are stored in a json file, so you can easily swap around or add images to songs without them
-  - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward
+    - The links are stored in a json file, so you can easily swap around or add images to songs without them
+    - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward
 - **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
-- **Instant Updating:** Thanks to the power of asyncio, your rich presence will update instantly when you start a new song.
+- **Instant Updating:** Thanks to the power of asyncio, your rich presence will only update when needed, and update instantly when you start a new song ~~(a rate limit of 15s applies)~~
 
 ## Setup
-Clone the repository, and install the dependencies; pypresence, dbus-fast, and HTTPX.
+Clone the repository, and install the dependencies however you like; pypresence, dbus-fast, and HTTPX.
+```commandline
+git clone https://github.com/Encampeded/YAMPR/
+```
 
 If you're on Arch:
 ```commandline
 pacman -S python-pypresence python-dbus-fast python-httpx
 ```
+
 Alternatively, make a virtual environment and install requirements with pip
 ```commandline
+cd YAMPR
 python -m venv venv
 source venv/bin/activate
 pip install .
@@ -45,8 +50,3 @@ TITLE = "TITLE"
 SUBTITLE = "SUBTITLE"
 IMAGE_LABEL = "IMAGE_LABEL"
 ```
-
-# Contributing
-Not sure why you'd contribute but a few things to keep in mind:
-- This was my first time writing async code, so it might be ~~probably is~~ a tad messy. If you'd like to change that, be my guest; just keep that in mind.
-- 

@@ -12,8 +12,8 @@ VERIFY_IMAGES = False
 #VERIFY_IMAGES = True
 
 # Refer to reference.png
-# Set to one of the following to display info from current song:
-#   title, artist,  album, album_artist, track_number, disc_number
+# Include one of the following names surrounded by brackets to display info from current song:
+#   title, artist, album, album_artist, track_number, disc_number
 #   composer, lyricist, genre, release_date
 
 LISTENING_TO = "music"
