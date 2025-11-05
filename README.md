@@ -14,7 +14,7 @@ Features I haven't seen elsewhere:
     - The links are stored in a json file, so you can easily swap around or add images to songs without them
     - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward
 - **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
-- **Instant Updating:** Thanks to the power of asyncio, your rich presence will only update when needed, and update instantly when you start a new song ~~(a rate limit of 15s applies)~~
+- **Instant Updating:** Thanks to the power of asyncio, your rich presence will only update when needed, and update instantly when you start a new song (although a rate limit of 15s applies)
 
 ## Setup
 Clone the repository, and install the dependencies however you like; pypresence, dbus-fast, and HTTPX.
