@@ -10,14 +10,14 @@
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
 Features I haven't seen elsewhere:
-- **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music actually display their covers!
-    - The links are stored in a json file, so you can easily swap around or add images to songs without them
+- **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music will display its album art!
+    - The links are stored in a json file, so you can easily swap around or add images to songs without them embedded
     - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward
 - **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
-- **Instant Updating:** Thanks to the power of asyncio, your rich presence will only update when needed, and update instantly when you start a new song (although a rate limit of 15s applies)
+- **Instant Updating:** Thanks to the power of asyncio, your rich presence will respond to seeks, pauses, and song changes instantly (although a rate limit of 15s does apply between changes)
 
 ## Setup
-Clone the repository, and install the dependencies however you like; pypresence, dbus-fast, and HTTPX.
+Clone the repository, and install the dependencies—pypresence, dbus-fast, and HTTPX—however you like.
 ```commandline
 git clone https://github.com/Encampeded/YAMPR/
 ```
