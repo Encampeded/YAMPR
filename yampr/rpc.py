@@ -28,7 +28,7 @@ class MPresence:
         position = self._dbus_connection.get_position()
 
         def try_format(string: str):
-            return string if not hasattr(song, string) else getattr(song, string)
+            return getattr(song, string, string)
 
         await self._rpc.update(
             activity_type=pypresence.ActivityType.LISTENING,

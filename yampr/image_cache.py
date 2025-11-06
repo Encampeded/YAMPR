@@ -92,7 +92,7 @@ class ImageCache:
             for key, link in self._image_cache.items():
                 tg.create_task(get(key, link))
 
-        for key, response in self._image_cache.copy().items():
+        for key, response in responses.items():
             if response.status_code == 404:
                 print("Removed", key)
                 self._image_cache.pop(key)

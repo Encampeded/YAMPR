@@ -3,6 +3,7 @@ import time
 import dbus_fast.aio
 import dbus_fast.introspection
 from .song import Song
+from .config import REQUIRED_PATH
 
 class DBusConnection:
 
@@ -98,7 +99,12 @@ class DBusConnection:
                 if not metadata["xesam:url"].value.startswith("file://"):
                     continue
 
-                if "xesam:artist" not in metadata:
+                # Only allow music in a certain folder
+                if not metadata["xesam:url"].value[7:].startswith(REQUIRED_PATH):
+                    continue
+
+                # Only allow music with actual metadata
+                if not all(key in metadata for key in ("xesam:title", "xesam:artist", "mpris:length")):
                     continue
 
                 # Set our interfaces

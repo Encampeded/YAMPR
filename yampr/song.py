@@ -39,16 +39,12 @@ class Song:
         self.release_date: str | None = None
         self.image: str | None = None
 
-    @staticmethod
-    def to_object_dict(raw_metadata: dict):
-        return { key.split(':')[1]: value.value for key, value in raw_metadata.items() }
-
     def list_get(self, attribute):
         value = self.metadata.get(attribute)
         return None if value is None else ', '.join(value)
 
     def update_from_metadata(self, raw_metadata):
-        self.metadata = (self.to_object_dict(raw_metadata))
+        self.metadata = { key.split(':')[1]: value.value for key, value in raw_metadata.items() }
 
         self.title = self.metadata["title"]
         self.artist = self.list_get("artist")
@@ -64,6 +60,3 @@ class Song:
         self.genre = self.list_get("genre")
         self.release_date = self.metadata.get("releaseDate")
         self.image = self.metadata.get("artUrl")
-
-    def __repr__(self):
-        return ", ".join([self.title, self.album, self.artist])
