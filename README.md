@@ -16,6 +16,10 @@ Features I haven't seen elsewhere:
 - **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
 - **Instant Updating:** Thanks to the power of asyncio, your rich presence will respond to seeks, pauses, and song changes instantly (although a rate limit of 15s does apply between changes)
 
+Intentional Limitations:
+- Paused music is not displayed. If you forget to close an mpv instance, it will be ignored to prevent your presence from elapsing time unto infinity
+- Only local music is displayed. Stuff streamed through your browser, spotify, or otherwise will be ignored.
+
 ## Setup
 Clone the repository, and install the dependencies—pypresence, dbus-fast, and HTTPX—however you like.
 ```commandline
@@ -50,3 +54,6 @@ TITLE = "TITLE"
 SUBTITLE = "SUBTITLE"
 IMAGE_LABEL = "IMAGE_LABEL"
 ```
+
+# Contributing
+Not sure why you'd want to contribute to this, but if you want to, keep in mind this was my first time writing async code. If something seems wack or is non-standard, that's probably why lol. Feel free to fix it. Or don't. I don't really care.
