@@ -67,7 +67,7 @@ class ImageCache:
 
 
     # Supply the number of images. If less than 800, just run it all.
-    # If more than 800... Tell the user. Make sure they want that.
+    # If more than 800... Tell the user... Because Yikes...
     async def verify_images(self):
         image_cache_size = len(self._image_cache)
 

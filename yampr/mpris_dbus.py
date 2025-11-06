@@ -60,7 +60,7 @@ class DBusConnection:
             #print(metadata)
             self._set_song(metadata)
             self._update_position(0)
-            # If the properties change, it implies we've moved onto a new song,
+            # If the metadata changes, it implies we've moved onto a new song,
             # meaning we can just set the position to 0.
 
         self.properties_changed.set()

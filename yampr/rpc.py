@@ -10,7 +10,7 @@ class MPresence:
     def __init__(self):
         self._image_cache = ImageCache()
         self._rpc = pypresence.AioPresence(
-            client_id = 1427764951690252308,  # this doesn't actually seem necessary. hmmm.
+            client_id = 1427764951690252308,
             loop = asyncio.get_running_loop()
         )
         self._dbus_connection = DBusConnection()
@@ -52,7 +52,7 @@ class MPresence:
         while self._dbus_connection.player_playing:
             print("\nAwaiting MPRIS Update...")
             await self._dbus_connection.properties_changed.wait()
-            self._dbus_connection.properties_changed.clear() # Move these to the top of the loop
+            self._dbus_connection.properties_changed.clear()
             print("    MPRIS Updated!")
 
             print("Updating Rich Presence...")
@@ -66,5 +66,3 @@ class MPresence:
 
     async def clear(self):
         await self._rpc.clear()
-
-

@@ -6,13 +6,13 @@ UPLOAD_SERVICE = "pomf.lain.la"
 # e.g. /home/encampeded/Music
 REQUIRED_PATH = ""
 
-# Verify cached image links. Will remove any that don't exist on startup,
-# but will take some time to complete.
+# Verify that cached image links still exist. Will remove any that don't exist on startup,
+# but will take some time (and bandwidth) to complete.
 VERIFY_IMAGES = False
 #VERIFY_IMAGES = True
 
 # Refer to reference.png
-# Include one of the following names surrounded by brackets to display info from current song:
+# Set any of the following variables to one of the following names to display info from current song:
 #   title, artist, album, album_artist, track_number, disc_number
 #   composer, lyricist, genre, release_date
 
