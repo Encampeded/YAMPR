@@ -14,7 +14,7 @@ class DBusConnection:
     MPRIS_PLAYER = "org.mpris.MediaPlayer2.Player"
 
     def __init__(self):
-        self._bus = None
+        self._bus = dbus_fast.aio.MessageBus()
         self._dbus = None
         self._player = None
         self._properties = None
@@ -36,7 +36,7 @@ class DBusConnection:
         )
 
     async def setup(self):
-        self._bus = await dbus_fast.aio.MessageBus().connect()
+        await self._bus.connect()
 
         dbus_proxy = await self._get_proxy(
             self.DBUS_NAME,
@@ -46,27 +46,27 @@ class DBusConnection:
         self._dbus = dbus_proxy.get_interface(self.DBUS_NAME)
 
 
-    def _set_song(self, metadata: dict):
-        self.song.update_from_metadata(metadata)
-
     def _update_song(self, _, changed_properties: dict, __):
         print("Received PropertiesChanged!")
 
         if "PlaybackStatus" in changed_properties:
             self.player_playing = False
 
-        else:
+        elif "Metadata" in changed_properties:
             metadata = changed_properties["Metadata"].value
-            #print(metadata)
-            self._set_song(metadata)
+            self.song.update_from_metadata(metadata)
             self._update_position(0)
             # If the metadata changes, it implies we've moved onto a new song,
             # meaning we can just set the position to 0.
 
+        else:
+            # Otherwise, we don't care about stuff like shuffling being enabled. So just return.
+            return
+
         self.properties_changed.set()
 
     def _update_position(self, position: int):
-        print("Received Seeked!")
+        print("Received Seeked! (or PropertiesChange)")
         self.position = position / 1000000
         self.position_updated = time.perf_counter()
         self.properties_changed.set()
@@ -113,7 +113,7 @@ class DBusConnection:
                 position = await self._player.get_position()
                 self._update_position(position)
                 metadata = await self._player.get_metadata()
-                self._set_song(metadata)
+                self.song.update_from_metadata(metadata)
                 self.player_playing = True
 
                 return

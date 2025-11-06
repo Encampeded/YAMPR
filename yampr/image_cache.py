@@ -54,6 +54,9 @@ class ImageCache:
 
     async def get(self, song) -> str:
         """Returns link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
+        if song.image is None:
+            return self.DEFAULT_IMAGE
+
         artist = song.album_artist if song.album_artist is not None else song.artist
 
         cache_key = song.file_path if song.album is None else (artist + ' - ' + song.album)
