@@ -62,7 +62,9 @@ class MPresence:
             print("Sleeping...")
             await asyncio.sleep(15)
 
-        await self.clear()
-
-    async def clear(self):
         await self._rpc.clear()
+
+    async def teardown(self):
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(self._rpc.clear())
+            tg.create_task(self._image_cache.close())

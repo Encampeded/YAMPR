@@ -14,7 +14,7 @@ async def main():
         print("Exiting...")
 
     finally:
-        await rpc.clear()
+        await rpc.teardown()
 
 
 if __name__ == "__main__":
