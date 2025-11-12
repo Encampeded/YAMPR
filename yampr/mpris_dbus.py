@@ -94,17 +94,18 @@ class DBusConnection:
                 if await player.get_playback_status() != "Playing":
                     continue
 
+                metadata: dict = await player.get_metadata()
+
+                # Only allow music with actual metadata to display
+                if not all(key in metadata for key in ("xesam:title", "xesam:artist", "mpris:length", "xesam:url")):
+                    continue
+
                 # Only allow local music
-                metadata = await player.get_metadata()
                 if not metadata["xesam:url"].value.startswith("file://"):
                     continue
 
                 # Only allow music in a certain folder
                 if not metadata["xesam:url"].value[7:].startswith(REQUIRED_PATH):
-                    continue
-
-                # Only allow music with actual metadata
-                if not all(key in metadata for key in ("xesam:title", "xesam:artist", "mpris:length")):
                     continue
 
                 # Set our interfaces
@@ -116,12 +117,23 @@ class DBusConnection:
                 self._player.on_seeked(self._update_position)
 
                 # Get/Set our new stuff
-                position = await self._player.get_position()
-                self._update_position(position)
-                metadata = await self._player.get_metadata()
-                self.song.update_from_metadata(metadata)
+                with asyncio.TaskGroup() as tg:
+                    position_task = tg.create_task(self._player.get_position)
+                    metadata_task = tg.create_task(self._player.get_metadata)
+
+                self._update_position(position_task.result())
+                self.song.update_from_metadata(metadata_task.result())
                 self.player_playing = True
 
                 return
 
             await asyncio.sleep(5)
+
+    async def close(self):
+        if self.player_playing:
+            self._properties.off_properties_changed(self._update_song)
+            self._player.off_seeked(self._update_position)
+        self._dbus = None
+        self._player = None
+        self._properties = None
+        await self._bus.wait_for_disconnect()

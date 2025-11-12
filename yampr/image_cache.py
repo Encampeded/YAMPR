@@ -16,7 +16,8 @@ class ImageCache:
         self._path: str = '/'.join(__file__.split('/')[:-1] + ["image_cache.json"])
 
         if not os.path.exists(self._path):
-            open(self._path, "w").write("{}")
+            with open(self._path, "w") as f:
+                f.write("{}")
 
         with open(self._path, 'r') as f:
             self._image_cache: dict = json.load(f)
@@ -32,7 +33,7 @@ class ImageCache:
         image_data: bytes = base64.b64decode(image_data[23:])
 
         link = ""
-        # IMPORTANT: If implementing a new upload service, check the rate limiting
+        # WARNING: If implementing a new upload service, check the rate limiting
         # and adjust verify_images accordingly.
         match UPLOAD_SERVICE:
             case "pomf.lain.la":
@@ -69,9 +70,8 @@ class ImageCache:
         return self._image_cache[cache_key]
 
 
-    # Supply the number of images. If less than 800, just run it all.
-    # If more than 800... Tell the user... Because Yikes...
     async def verify_images(self):
+        """Verifies the links in image_cache.json are all still valid."""
         image_cache_size = len(self._image_cache)
 
         # pomf.lain.la rate limits at 1 link per second, with a buffer of 800 requests.
@@ -100,3 +100,6 @@ class ImageCache:
                 raise ValueError("Received other response code", response.status_code)
 
         self._export_cache()
+
+    async def close(self):
+        await self._client.aclose()
