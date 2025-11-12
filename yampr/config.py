@@ -11,7 +11,6 @@ REQUIRED_PATH = ""
 VERIFY_IMAGES = False
 #VERIFY_IMAGES = True
 
-# Refer to reference.png
 # Set any of the following variables to one of the following names to display info from current song:
 #   title, artist, album, album_artist, track_number, disc_number
 #   composer, lyricist, genre, release_date
