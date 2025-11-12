@@ -3,6 +3,7 @@ import time
 import asyncio
 from .image_cache import ImageCache
 from .mpris_dbus import DBusConnection
+from .song import Song
 from . import config
 
 class MPresence:
@@ -23,9 +24,9 @@ class MPresence:
                 tg.create_task(self._image_cache.verify_images())
 
     async def update(self):
-        song = self._dbus_connection.song
-        image_link = await self._image_cache.get(song)
-        position = self._dbus_connection.get_position()
+        song: Song = self._dbus_connection.song
+        image_link: str = await self._image_cache.get(song)
+        position: float = self._dbus_connection.get_position()
 
         def try_format(string: str):
             return getattr(song, string, string)

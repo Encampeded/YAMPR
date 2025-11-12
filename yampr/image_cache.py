@@ -29,7 +29,7 @@ class ImageCache:
     async def _upload(self, image_data: str) -> str:
         """Uploads given image data and returns the link."""
         print("Uploading image...")
-        image_data = base64.b64decode(image_data[23:])
+        image_data: bytes = base64.b64decode(image_data[23:])
 
         link = ""
         # IMPORTANT: If implementing a new upload service, check the rate limiting
