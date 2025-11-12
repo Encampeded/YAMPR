@@ -19,28 +19,29 @@ Features I haven't seen elsewhere:
 Intentional Limitations:
 - Paused music is not displayed. If you forget to close an mpv instance, it will be ignored to prevent your presence from elapsing time unto infinity
 - Only local music is displayed. Stuff streamed through your browser, spotify, or otherwise will be ignored.
+  - For something more fully featured, try [music-discord-rpc.](https://github.com/patryk-ku/music-discord-rpc) This project is really just meant for local music (hence the custom covers and restrictions)
 
 ## Setup
-Clone the repository, and install the dependencies—pypresence, dbus-fast, and HTTPX—however you like.
+Clone the repository.
 ```commandline
 git clone https://github.com/Encampeded/YAMPR/
 ```
+
+Install the dependencies; pypresence, dbus-fast, and HTTPX.
 
 If you're on Arch:
 ```commandline
 pacman -S python-pypresence python-dbus-fast python-httpx
 ```
-
-Alternatively, make a virtual environment and install requirements with pip
+Alternatively, make a virtual environment and install requirements with pip:
 ```commandline
-cd YAMPR
 python -m venv venv
 source venv/bin/activate
 pip install .
 ```
 Make sure your music player (or its backend) supports MPRIS. For example, mpv requires the mpv-mpris plugin.
 # Usage
-Just run the module.
+Run the module in the repository directory.
 ```commandline
 python -m yampr
 ```
@@ -54,6 +55,7 @@ TITLE = "TITLE"
 SUBTITLE = "SUBTITLE"
 IMAGE_LABEL = "IMAGE_LABEL"
 ```
+<br>
 
 # Contributing
 Not sure why you'd want to contribute to this, but if you want to, keep in mind this was my first time writing async code. If something seems wack or is non-standard, that's probably why lol. Feel free to fix it. Or don't. I don't really care.
