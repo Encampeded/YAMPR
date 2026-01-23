@@ -46,6 +46,15 @@ class DBusConnection:
 
         self._dbus = dbus_proxy.get_interface(self.DBUS_NAME)
 
+    @staticmethod
+    def _is_valid_metadata(metadata: dict) -> bool:
+        """Checks metadata to ensure a song is local, has sufficient metadata, and is in REQUIRED_PATH"""
+        if metadata["xesam:url"].value.startswith("file://") and \
+           all(key in metadata for key in ("xesam:title", "xesam:artist", "mpris:length", "xesam:url")) and \
+           metadata["xesam:url"].value[7:].startswith(REQUIRED_PATH):
+            return True
+
+        return False
 
     def _update_song(self, _, changed_properties: dict, __):
         print("Received PropertiesChanged!")
@@ -55,6 +64,10 @@ class DBusConnection:
 
         elif "Metadata" in changed_properties:
             metadata = changed_properties["Metadata"].value
+            if not self._is_valid_metadata(metadata):
+                self.player_playing = False
+                return
+
             self.song.update_from_metadata(metadata)
             self._update_position(0)
             # If the metadata changes, it implies we've moved onto a new song,
@@ -88,6 +101,9 @@ class DBusConnection:
                     self.MPRIS_PATH
                 )
 
+                if not player_object.introspection.interfaces:
+                    continue
+
                 player = player_object.get_interface("org.mpris.MediaPlayer2.Player")
 
                 # Only allow playing music, so we don't get stuck on forgotten paused instances
@@ -96,16 +112,7 @@ class DBusConnection:
 
                 metadata: dict = await player.get_metadata()
 
-                # Only allow music with actual metadata to display
-                if not all(key in metadata for key in ("xesam:title", "xesam:artist", "mpris:length", "xesam:url")):
-                    continue
-
-                # Only allow local music
-                if not metadata["xesam:url"].value.startswith("file://"):
-                    continue
-
-                # Only allow music in a certain folder
-                if not metadata["xesam:url"].value[7:].startswith(REQUIRED_PATH):
+                if not self._is_valid_metadata(metadata):
                     continue
 
                 # Set our interfaces
@@ -117,12 +124,8 @@ class DBusConnection:
                 self._player.on_seeked(self._update_position)
 
                 # Get/Set our new stuff
-                with asyncio.TaskGroup() as tg:
-                    position_task = tg.create_task(self._player.get_position)
-                    metadata_task = tg.create_task(self._player.get_metadata)
-
-                self._update_position(position_task.result())
-                self.song.update_from_metadata(metadata_task.result())
+                self._update_position(await self._player.get_position())
+                self.song.update_from_metadata(await    self._player.get_metadata())
                 self.player_playing = True
 
                 return

@@ -30,7 +30,8 @@ class ImageCache:
     async def _upload(self, image_data: str) -> str:
         """Uploads given image data and returns the link."""
         print("Uploading image...")
-        image_data: bytes = base64.b64decode(image_data[23:])
+        # Trims the URI (data:image/jpeg;base64,) from the image data
+        image_data: bytes = b64decode(image_data.partition(',')[2])
 
         link = ""
         # WARNING: If implementing a new upload service, check the rate limiting
@@ -58,9 +59,11 @@ class ImageCache:
         if song.image is None:
             return self.DEFAULT_IMAGE
 
-        artist = song.album_artist if song.album_artist is not None else song.artist
+        # If we have an album with multiple artists but one cover, we should use the
+        # album artist instead of the song-by-song artist
+        artist = song.album_artist if song.album_artist else song.artist
 
-        cache_key = song.file_path if song.album is None else (artist + ' - ' + song.album)
+        cache_key = song.file_path if not song.album else (artist + ' - ' + song.album)
 
         if cache_key not in self._image_cache:
             link = self.DEFAULT_IMAGE if song.image is None else await self._upload(song.image)
@@ -79,7 +82,7 @@ class ImageCache:
         if image_cache_size >= 500:
             print("Image cache has", image_cache_size, "links, which is more than 500")
             print("Verification will not commence, as it would be too slow/you'd get rate limited/im lazy.")
-            print("Please clean up your cache, or clear it entirely.")
+            print("Please clean up your cache (YAMPR/yampr/image_cache.json), or clear it entirely.")
             return
 
         responses = {}
@@ -88,7 +91,7 @@ class ImageCache:
             response = await self._client.get(link) # noqa
             responses[key] = response
 
-        with asyncio.TaskGroup() as tg:
+        async with asyncio.TaskGroup() as tg:
             for key, link in self._image_cache.items():
                 tg.create_task(get(key, link))
 

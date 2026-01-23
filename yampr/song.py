@@ -39,7 +39,7 @@ class Song:
         self.release_date: str | None = None
         self.image: str | None = None
 
-    def list_get(self, attribute):
+    def list_get(self, attribute) -> str | None:
         value = self.metadata.get(attribute)
         return None if value is None else ', '.join(value)
 

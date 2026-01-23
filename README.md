@@ -9,9 +9,6 @@
 
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
-Update as of 11/12/25:<br>
-[You should probably be using this instead.](https://github.com/lazykern/mprisence)
-
 Features I haven't seen elsewhere:
 - **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music will display its album art!
     - The links are stored in a json file, so you can easily swap around or add images to songs without them embedded
@@ -22,7 +19,8 @@ Features I haven't seen elsewhere:
 Intentional Limitations:
 - Paused music is not displayed. If you forget to close an mpv instance, it will be ignored to prevent your presence from elapsing time unto infinity
 - Only local music is displayed. Stuff streamed through your browser, spotify, or otherwise will be ignored.
-  - For something more fully featured, try [music-discord-rpc.](https://github.com/patryk-ku/music-discord-rpc) This project is really just meant for local music (hence the custom covers and restrictions)
+
+For something more fully featured, try [mprisence](https://github.com/lazykern/mprisence) or [music-discord-rpc.](https://github.com/patryk-ku/music-discord-rpc) This project is really just meant for local music (hence the custom covers and restrictions)
 
 ## Setup
 Clone the repository.
