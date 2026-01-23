@@ -1,10 +1,10 @@
 import pypresence
 import time
 import asyncio
-from .image_cache import ImageCache
-from .mpris_dbus import DBusConnection
-from .song import Song
-from . import config
+from image_cache import ImageCache
+from mpris_dbus import DBusConnection
+from song import Song
+import config
 
 class MPresence:
 

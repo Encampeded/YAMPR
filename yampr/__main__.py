@@ -1,4 +1,4 @@
-from .rpc import MPresence
+from rpc import MPresence
 import asyncio
 
 async def main():

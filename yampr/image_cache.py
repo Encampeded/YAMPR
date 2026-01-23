@@ -1,9 +1,9 @@
 import asyncio
 import json
 import httpx
-import base64
+from base64 import b64decode
 import os.path
-from .config import UPLOAD_SERVICE
+from config import UPLOAD_SERVICE
 
 class ImageCache:
     # just a picture of the mpv logo

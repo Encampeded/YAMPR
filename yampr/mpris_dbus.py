@@ -2,8 +2,8 @@ import asyncio
 import time
 import dbus_fast.aio
 import dbus_fast.introspection
-from .song import Song
-from .config import REQUIRED_PATH
+from song import Song
+from config import REQUIRED_PATH
 
 class DBusConnection:
 
