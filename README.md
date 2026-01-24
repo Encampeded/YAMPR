@@ -12,7 +12,7 @@
 Features I haven't seen elsewhere:
 - **Custom Covers:** Your local album covers are uploaded to a service of your choosing, meaning your obscure, undocumented-online music will display its album art!
     - The links are stored in a json file, so you can easily swap around or add images to songs without them embedded
-    - Currently, only pomf.lain.la is supported, but adding new services is (theoretically) extremely straight forward
+    - Currently supports pomf.lain.la and catbox.moe, and adding new services is (theoretically) extremely straight forward
 - **Configurability:** Customize the appearance of your rich presence to your liking. The possibilities are endless! (not really, but still)
 - **Instant Updating:** Thanks to the power of asyncio, your rich presence will respond to seeks, pauses, and song changes instantly (although a rate limit of 15s does apply between changes)
 

@@ -1,6 +1,6 @@
 # The website you want to upload your covers to
-# Currently only supports pomf.lain.la
-UPLOAD_SERVICE = "pomf.lain.la"
+# Currently supports pomf.lain.la and catbox.moe
+UPLOAD_SERVICE = "catbox.moe"
 
 # Only display music in a certain directory
 # e.g. /home/encampeded/Music

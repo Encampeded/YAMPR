@@ -38,15 +38,26 @@ class ImageCache:
         # and adjust verify_images accordingly.
         match UPLOAD_SERVICE:
             case "pomf.lain.la":
-                # Without "~/cover.jpg" it just doesn't upload. Not sure why
-                files = {"files[]": ('~/cover.jpg', image_data)}
 
-                response = await self._client.post(f"https://pomf2.lain.la/upload.php", files=files)
+                response = await self._client.post(
+                    "https://pomf2.lain.la/upload.php",
+                    # Without "~/cover.jpg" it just doesn't upload. Not sure why
+                    files = {"files[]": ('~/cover.jpg', image_data)}
+                )
+                response.raise_for_status()
 
-                if response.status_code == 200:
-                    link = response.json()["files"][0]["url"]
-                else:
-                    raise ConnectionError("Failed to Upload Cover:", response.text)
+                link = response.json()["files"][0]["url"]
+
+            case "catbox.moe":
+
+                response = await self._client.post(
+                    "https://catbox.moe/user/api.php",
+                    data =  {"reqtype": "fileupload"},
+                    files = {"fileToUpload": image_data}
+                )
+                response.raise_for_status()
+
+                link = response.text.strip()
 
             case _:
                 raise ValueError("Invalid upload service! Check config.py")
