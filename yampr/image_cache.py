@@ -67,9 +67,6 @@ class ImageCache:
 
     async def get(self, song) -> str:
         """Returns link to the provided song's image. Gets from cache or uploads and adds to cache if not present."""
-        if song.image is None:
-            return self.DEFAULT_IMAGE
-
         # If we have an album with multiple artists but one cover, we should use the
         # album artist instead of the song-by-song artist
         artist = song.album_artist if song.album_artist else song.artist
